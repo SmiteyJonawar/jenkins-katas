@@ -2,9 +2,6 @@ pipeline {
   agent any
   stages {
     stage('Clone Down') {
-      when {
-        branch 'master'
-      }
       steps {
         sh 'echo "yellow ornage"'
         stash(name: 'code', excludes: '.git')
@@ -54,6 +51,9 @@ pipeline {
 
     stage('push docker app') {
       agent any
+      when {
+        branch 'master'
+      }
       environment {
         DOCKERCREDS = credentials('docker_login')
       }
