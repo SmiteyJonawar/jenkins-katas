@@ -1,7 +1,14 @@
 pipeline {
   agent any
   stages {
-    stage('Parallel execution') {
+    stage('Clone Down') {
+      steps {
+        sh 'echo "yellow ornage"'
+        stash(excludes: '.git/*', name: 'code')
+      }
+    }
+
+    stage('Parallel Execution') {
       parallel {
         stage('Say Hello') {
           steps {
@@ -9,19 +16,37 @@ pipeline {
           }
         }
 
-        stage('Build app') {
+        stage('build app') {
           agent {
             docker {
               image 'gradle:jdk11'
             }
 
           }
+          options {
+            skipDefaultCheckout(true)
+          }
           steps {
+            unstash 'code'
             sh 'ci/build-app.sh'
             archiveArtifacts 'app/build/libs/'
-            sh 'ls'
-            deleteDir()
-            sh 'ls'
+          }
+        }
+
+        stage('test app') {
+          agent {
+            docker {
+              image 'gradle:jdk11'
+            }
+
+          }
+          options {
+            skipDefaultCheckout(true)
+          }
+          steps {
+            unstash 'code'
+            sh 'ci/unit-test-app.sh'
+            junit 'app/build/test-results/test/TEST-.xml'
           }
         }
 
