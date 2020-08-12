@@ -2,6 +2,9 @@ pipeline {
   agent any
   stages {
     stage('Clone Down') {
+      when {
+        branch 'master'
+      }
       steps {
         sh 'echo "yellow ornage"'
         stash(name: 'code', excludes: '.git')
