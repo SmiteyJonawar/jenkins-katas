@@ -4,7 +4,7 @@ pipeline {
     stage('Clone Down') {
       steps {
         sh 'echo "yellow ornage"'
-        stash(excludes: '.git/*', name: 'code')
+        stash(name: 'code', excludes: '.git')
       }
     }
 
@@ -23,27 +23,11 @@ pipeline {
             }
 
           }
-          options {
-            skipDefaultCheckout(true)
-          }
           steps {
             unstash 'code'
             sh 'ci/build-app.sh'
+            skipDefaultCheckout true
             archiveArtifacts 'app/build/libs/'
-          }
-        }
-
-        stage('test app') {
-          agent {
-            docker {
-              image 'gradle:jdk11'
-            }
-
-          }
-          steps {
-            unstash 'code'
-            sh 'ci/unit-test-app.sh'
-            junit 'app/build/test-results/test/TEST-.xml'
           }
         }
 
