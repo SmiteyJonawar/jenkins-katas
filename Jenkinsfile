@@ -65,6 +65,20 @@ pipeline {
       }
     }
 
+    stage('Component test') {
+      agent any
+      when {
+        not {
+          branch 'dev/*'
+        }
+
+      }
+      steps {
+        unstash 'code'
+        sh 'ci/component-test.sh'
+      }
+    }
+
   }
   environment {
     docker_username = 'jonawar'
