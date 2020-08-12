@@ -49,6 +49,7 @@ pipeline {
     }
 
     stage('push docker app') {
+      agent any
       environment {
         DOCKERCREDS = credentials('docker_login')
       }
